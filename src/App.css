@@ -1,0 +1,143 @@
+/* ----------------------------------------------------
+   MAIN APPLICATION LAYOUTS (VANILLA CSS)
+   ---------------------------------------------------- */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  background-color: var(--bg-primary);
+  transition: background-color var(--transition-normal);
+}
+
+/* Home Section Layouts */
+.trending-section {
+  padding: 40px 0 20px 0;
+  border-bottom: 2px solid var(--border);
+}
+
+.trending-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 10px 0;
+  scrollbar-width: none; /* Firefox */
+}
+
+.trending-container::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.trending-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.trending-subject-pill {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--bg-primary);
+  border: 2px solid var(--border) !important;
+  color: var(--text-primary);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.trending-subject-pill:hover {
+  background: var(--secondary);
+  color: var(--text-primary);
+  transform: translate(-1.5px, -1.5px);
+  box-shadow: var(--shadow-md);
+}
+
+.trending-subject-pill:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 0px 0px 0px var(--border);
+}
+
+/* Tab Navigation inside Explore Area */
+.explore-tabs-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+
+.explore-tabs {
+  display: flex;
+  gap: 24px;
+}
+
+.explore-tab {
+  background: transparent;
+  border: none;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 14px 2px;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.explore-tab:hover {
+  color: var(--text-primary);
+}
+
+.explore-tab-active {
+  color: var(--text-primary);
+}
+
+.explore-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+}
+
+/* User lists (Bookmarks / Uploads) layouts */
+.dashboard-header {
+  margin-bottom: 32px;
+  animation: slideDown var(--transition-normal) forwards;
+}
+
+.dashboard-header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.dashboard-header p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* Responsive sidebar animations */
+@keyframes sidebarSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes sidebarSlideOut {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}

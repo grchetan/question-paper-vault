@@ -1,0 +1,126 @@
+/* ----------------------------------------------------
+   TOAST STYLES (VANILLA CSS)
+   ---------------------------------------------------- */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  min-width: 320px;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border) !important;
+  box-shadow: var(--shadow-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all var(--transition-fast);
+}
+
+.toast-closing {
+  animation: toastSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Success Toast */
+.toast-success {
+  border-left: 8px solid var(--success) !important;
+}
+
+.toast-success-icon {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+/* Error Toast */
+.toast-error {
+  border-left: 8px solid var(--error) !important;
+}
+
+.toast-error-icon {
+  color: var(--error);
+  flex-shrink: 0;
+}
+
+/* Info Toast */
+.toast-info {
+  border-left: 8px solid var(--primary) !important;
+}
+
+.toast-info-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.toast-message {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+.toast-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.toast-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* Animations */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(120%) scale(0.9);
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .toast-container {
+    top: auto;
+    bottom: 24px;
+    right: 16px;
+    left: 16px;
+  }
+  .toast {
+    min-width: 0;
+    width: 100%;
+  }
+}
