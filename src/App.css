@@ -141,3 +141,37 @@
   from { transform: translateX(0); }
   to { transform: translateX(100%); }
 }
+
+@media (max-width: 600px) {
+  .explore-tabs-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding-bottom: 12px !important;
+  }
+  .papers-meta {
+    align-self: flex-start !important;
+  }
+  .dashboard-header {
+    margin-bottom: 24px !important;
+  }
+  .dashboard-header h1 {
+    font-size: 1.6rem !important;
+  }
+  .dashboard-header p {
+    font-size: 0.85rem !important;
+  }
+  .trending-container {
+    gap: 10px !important;
+  }
+  .trending-subject-pill {
+    padding: 5px 10px !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-padding {
+    padding: 36px 0 !important;
+  }
+}

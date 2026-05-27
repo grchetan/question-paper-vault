@@ -337,3 +337,9 @@ button, input, select, textarea {
     padding: 0 16px;
   }
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px !important;
+  }
+}

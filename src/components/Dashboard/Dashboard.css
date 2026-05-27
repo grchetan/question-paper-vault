@@ -1520,15 +1520,20 @@
   padding: 24px;
   background: var(--card-bg);
   border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border) !important;
+  box-shadow: var(--shadow-md) !important;
   text-align: center;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .stat-card:hover {
-  transform: translateY(-2.5px);
-  box-shadow: var(--shadow-md);
+  transform: translate(-2px, -2px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.stat-card:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow: 0px 0px 0px var(--border) !important;
 }
 
 /* Premium CTA Banner responsive styles */
@@ -1548,7 +1553,7 @@
 /* MEDIA QUERIES FOR RESPONSIVENESS AND 1366px LAPTOPS */
 @media (max-width: 1366px) {
   .hero h1, .hero-title-interactive {
-    font-size: 2.8rem;
+    font-size: clamp(2rem, 5vw, 2.8rem) !important;
   }
   .hero-illustration-wrapper {
     max-width: 440px;
@@ -1565,7 +1570,28 @@
 @media (max-width: 968px) {
   .hero {
     min-height: auto;
-    padding: 60px 0;
+    padding: 40px 0;
+  }
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+    text-align: center;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .hero-right {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16px;
+  }
+  .hero-illustration-wrapper {
+    max-width: 320px !important;
+    aspect-ratio: 1.15 !important;
   }
   .bento-paper-showcase {
     grid-template-columns: 1fr !important;
@@ -1602,26 +1628,86 @@
     display: none !important;
   }
   
+  /* Make pills wrap properly on tablet/mobile and center them, avoiding horizontal scroll */
+  .quick-pills {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+  
   /* Disable heavy float parallax offsets on mobile/tablet to avoid overflow */
   .floating-parallax-item {
-    opacity: 0.18 !important; /* Muted in background */
+    opacity: 0.08 !important; /* Extremely subtle in background */
+    transform: scale(0.65) !important;
   }
-  .paper-math { left: 4% !important; top: 12% !important; }
+  .paper-math { left: -20px !important; top: 12% !important; }
   .paper-cs { display: none !important; }
   .paper-physics { display: none !important; }
-  .grade-badge { right: 4% !important; bottom: 12% !important; }
+  .grade-badge { right: -20px !important; bottom: 12% !important; }
 }
 
 @media (max-width: 480px) {
-  .hero-title-interactive {
-    font-size: 2.0rem;
-    letter-spacing: -0.8px;
+  .hero h1, .hero-title-interactive {
+    font-size: clamp(1.4rem, 6.8vw, 2.0rem) !important;
+    letter-spacing: -0.5px !important;
+    line-height: 1.15 !important;
+  }
+  .word-highlight {
+    padding: 2px 6px !important;
+    border-width: 1.5px !important;
+    border-radius: var(--radius-sm) !important;
+  }
+  .hero-subtitle {
+    font-size: 0.95rem !important;
+    margin-bottom: 20px !important;
+  }
+  .hero-illustration-wrapper {
+    max-width: 250px !important;
+    aspect-ratio: 1.15 !important;
   }
   .stats-grid {
     grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .stat-card {
+    padding: 16px 20px !important;
+  }
+  .stat-card h3 {
+    font-size: 2.0rem !important;
   }
   .bento-cell {
-    padding: 24px 18px;
+    padding: 20px 16px !important;
+  }
+  /* Fix papers grid clipping by forcing single column scale on small viewports */
+  .papers-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  /* Clean up card paddings to preserve horizontal width safety */
+  .paper-card {
+    padding: 16px !important;
+    min-height: auto !important;
+  }
+  .paper-actions .btn {
+    padding: 6px 8px !important;
+    font-size: 0.75rem !important;
+    min-width: 60px !important;
+  }
+  .stacked-card-graphic-wrapper {
+    height: 130px !important;
+    transform: scale(0.8) !important;
+    margin-top: 8px !important;
+  }
+  .search-bar {
+    padding: 4px 6px 4px 12px !important;
+  }
+  .search-input {
+    font-size: 0.88rem !important;
+  }
+  .search-bar .btn {
+    padding: 8px 14px !important;
+    font-size: 0.85rem !important;
   }
 }
 

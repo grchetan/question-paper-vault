@@ -56,7 +56,7 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenMobileSidebar }) => {
                 <path d="M11 22V10h5.5c2.5 0 4.5 1.2 4.5 3.5s-2 3.5-4.5 3.5H11" stroke="var(--border)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span className="brand-name" style={{ fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.5px' }}>Plinth</span>
+            <span className="brand-name">Plinth</span>
           </div>
 
           {/* Navigation Links */}
