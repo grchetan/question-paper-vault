@@ -35,13 +35,13 @@ export const PaperViewer = ({ paper, onClose }) => {
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Calendar size={12} /> Year: {paper.year}
               </span>
-              <span>•</span>
+              <span className="viewer-meta-sep" aria-hidden="true">•</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Award size={12} /> Board: {paper.boardOrUniversity}
+                <Award size={12} /> {paper.boardOrUniversity}
               </span>
-              <span>•</span>
+              <span className="viewer-meta-sep" aria-hidden="true">•</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <HardDrive size={12} /> Size: {paper.fileSize || '1.2 MB'}
+                <HardDrive size={12} /> {paper.fileSize || '1.2 MB'}
               </span>
             </div>
           </div>
