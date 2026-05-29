@@ -63,12 +63,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const sendPasswordReset = async (email) => {
-    setLoading(true);
-    try {
-      await authService.sendPasswordReset(email);
-    } finally {
-      setLoading(false);
-    }
+    await authService.sendPasswordReset(email);
   };
 
   const value = {

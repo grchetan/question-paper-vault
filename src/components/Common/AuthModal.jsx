@@ -18,6 +18,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
     password: '',
     confirmPassword: ''
   });
+  const [resetStatus, setResetStatus] = useState({ type: '', message: '' });
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -25,6 +26,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
   const handleClose = () => {
     setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+    setResetStatus({ type: '', message: '' });
     onClose();
   };
 
@@ -52,19 +54,32 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
   const handleForgotPasswordSubmit = async (e) => {
     e.preventDefault();
+    setResetStatus({ type: '', message: '' });
+
     if (!formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      toast.error('Please enter a valid email address.');
+      const invalidEmailMsg = 'Please enter a valid email address.';
+      toast.error(invalidEmailMsg);
+      setResetStatus({ type: 'error', message: invalidEmailMsg });
       return;
     }
 
     setLoading(true);
     try {
       await sendPasswordReset(formData.email);
-      toast.success('Password reset email sent successfully! Please check your inbox.');
-      setActiveTab('login');
+      const successMsg = 'Password reset link has been sent to your email. Please check your inbox.';
+      toast.success(successMsg);
+      setResetStatus({ type: 'success', message: successMsg });
     } catch (err) {
       console.error(err);
-      toast.error(err.message || 'Failed to send password reset email.');
+      let errorMsg = err.message || 'Failed to send password reset email.';
+      
+      // Smart error overrides for forgot password
+      if (err.code === 'auth/user-not-found' || err.message?.includes('user-not-found') || err.message?.includes('No user account found')) {
+        errorMsg = 'No account found with this email. Please verify spelling or sign up first!';
+      }
+      
+      toast.error(errorMsg);
+      setResetStatus({ type: 'error', message: errorMsg });
     } finally {
       setLoading(false);
     }
@@ -182,6 +197,25 @@ export const AuthModal = ({ isOpen, onClose }) => {
                 Enter your email address and we will send you a secure link to reset your password and link your account credentials.
               </p>
               
+              {resetStatus.message && (
+                <div 
+                  className={`status-message status-${resetStatus.type}`}
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    border: '2px solid var(--border)',
+                    marginBottom: '16px',
+                    backgroundColor: resetStatus.type === 'success' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                    color: resetStatus.type === 'success' ? 'var(--success)' : 'var(--error)',
+                    animation: 'fadeIn 0.25s ease-in-out'
+                  }}
+                >
+                  {resetStatus.message}
+                </div>
+              )}
+              
               <div className="auth-field">
                 <label htmlFor="reset-email">Email Address</label>
                 <div className="auth-field-input">
@@ -205,7 +239,10 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
               <button 
                 type="button" 
-                onClick={() => setActiveTab('login')}
+                onClick={() => {
+                  setResetStatus({ type: '', message: '' });
+                  setActiveTab('login');
+                }}
                 style={{ background: 'transparent', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.82rem', marginTop: '14px', fontWeight: '800', textAlign: 'center', width: '100%', display: 'block', textDecoration: 'underline' }}
               >
                 Back to Login
