@@ -4,7 +4,8 @@ import {
   signInWithPopup, 
   signOut, 
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { auth, googleProvider, isRealFirebase } from '../config/firebase';
 
@@ -60,7 +61,8 @@ export const authService = {
   signUpWithEmail: async (email, password, displayName) => {
     if (isRealFirebase) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(userCredential.user, { displayName });
+      const photoURL = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(displayName)}`;
+      await updateProfile(userCredential.user, { displayName, photoURL });
       return userCredential.user;
     } else {
       await delay(600);
@@ -138,6 +140,21 @@ export const authService = {
       return () => {
         mockAuthListeners.delete(callback);
       };
+    }
+  },
+
+  // 6. Send Password Reset Email (Forgot Password helper)
+  sendPasswordReset: async (email) => {
+    if (isRealFirebase) {
+      await sendPasswordResetEmail(auth, email);
+    } else {
+      await delay(500);
+      const users = getMockUsers();
+      const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!userExists) {
+        throw new Error('No user account found matching this email.');
+      }
+      console.log(`[Mock Auth] Password reset link sent to: ${email}`);
     }
   }
 };

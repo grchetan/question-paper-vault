@@ -62,6 +62,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const sendPasswordReset = async (email) => {
+    setLoading(true);
+    try {
+      await authService.sendPasswordReset(email);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     currentUser,
     loading,
@@ -69,6 +78,7 @@ export const AuthProvider = ({ children }) => {
     registerWithEmail,
     loginWithGoogle,
     logout,
+    sendPasswordReset,
     isAuthenticated: !!currentUser
   };
 

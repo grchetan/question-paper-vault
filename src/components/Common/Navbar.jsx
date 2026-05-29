@@ -130,7 +130,9 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenMobileSidebar }) => {
                   aria-label="Open profile menu"
                 >
                   <img 
-                    src={currentUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${currentUser.displayName}`} 
+                    src={(!currentUser.photoURL || currentUser.photoURL.includes('googleusercontent.com/a/'))
+                      ? `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentUser.displayName || 'User')}`
+                      : currentUser.photoURL} 
                     alt="avatar" 
                     className="avatar-img"
                   />

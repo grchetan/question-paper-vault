@@ -62,7 +62,9 @@ export const Sidebar = ({ isOpen, onClose, activeTab, setActiveTab, onOpenAuth }
             marginBottom: '24px' 
           }}>
             <img 
-              src={currentUser.photoURL || `https://api.dicebear.com/7.x/adventurer/svg?seed=${currentUser.displayName}`} 
+              src={(!currentUser.photoURL || currentUser.photoURL.includes('googleusercontent.com/a/'))
+                ? `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentUser.displayName || 'User')}`
+                : currentUser.photoURL} 
               alt="avatar" 
               className="avatar-img"
               style={{ width: 42, height: 42 }}
