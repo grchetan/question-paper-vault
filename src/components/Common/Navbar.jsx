@@ -91,6 +91,15 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenMobileSidebar }) => {
             >
               My Uploads
             </span>
+            {isAuthenticated && (currentUser?.email === 'chetan.prajapat.work@gmail.com' || currentUser?.email === 'admin@plinth.com') && (
+              <span 
+                className={`navbar-link ${activeTab === 'admin' ? 'navbar-link-active' : ''}`}
+                onClick={() => setActiveTab('admin')}
+                style={{ color: 'var(--primary)', fontWeight: '800' }}
+              >
+                Admin Panel
+              </span>
+            )}
           </div>
 
           {/* Action Actions */}
@@ -134,6 +143,13 @@ export const Navbar = ({ activeTab, setActiveTab, onOpenMobileSidebar }) => {
                       <div className="dropdown-header-name">{currentUser.displayName}</div>
                       <div className="dropdown-header-email">{currentUser.email}</div>
                     </div>
+
+                    {(currentUser?.email === 'chetan.prajapat.work@gmail.com' || currentUser?.email === 'admin@plinth.com') && (
+                      <button className="dropdown-item" onClick={() => handleDropdownItemClick('admin')} style={{ color: 'var(--primary)', fontWeight: '700' }}>
+                        <BookOpen size={16} color="var(--primary)" />
+                        <span>Admin Panel</span>
+                      </button>
+                    )}
 
                     <button className="dropdown-item" onClick={() => handleDropdownItemClick('my-uploads')}>
                       <User size={16} />

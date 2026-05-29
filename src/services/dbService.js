@@ -180,10 +180,23 @@ const INITIAL_PAPERS = [
 const getMockPapers = () => {
   let papers = localStorage.getItem('mock_papers');
   if (!papers) {
-    localStorage.setItem('mock_papers', JSON.stringify(INITIAL_PAPERS));
-    return INITIAL_PAPERS;
+    const seeded = INITIAL_PAPERS.map(p => ({ ...p, verificationStatus: 'verified' }));
+    localStorage.setItem('mock_papers', JSON.stringify(seeded));
+    return seeded;
   }
-  return JSON.parse(papers);
+  const parsed = JSON.parse(papers);
+  let changed = false;
+  const upgraded = parsed.map(p => {
+    if (!p.verificationStatus) {
+      p.verificationStatus = 'verified';
+      changed = true;
+    }
+    return p;
+  });
+  if (changed) {
+    localStorage.setItem('mock_papers', JSON.stringify(upgraded));
+  }
+  return upgraded;
 };
 
 const saveMockPapers = (papers) => {
@@ -353,7 +366,7 @@ export const dbService = {
 
       const paperSizeString = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
 
-      // Step 5: Save Upload metadata details into Supabase Postgres database
+      const isAdmin = uploaderUser?.email === 'chetan.prajapat.work@gmail.com' || uploaderUser?.email === 'admin@plinth.com';
       const insertRecord = {
         title: paperData.title,
         subjectName: paperData.subjectName,
@@ -365,19 +378,34 @@ export const dbService = {
         description: paperData.description || '',
         fileUrl: publicUrl,
         fileSize: paperSizeString,
-        uploaderName: uploaderUser.displayName || 'Anonymous Student',
-        uploaderId: uploaderUser.uid, // Firebase UID connecting with Supabase records
+        uploaderName: isAdmin ? 'Plinth Official' : (uploaderUser.displayName || 'Anonymous Student'),
+        uploaderId: isAdmin ? 'plinth-official' : uploaderUser.uid,
+        verificationStatus: isAdmin ? 'verified' : 'pending',
         downloadsCount: 0,
         createdAt: new Date().toISOString()
       };
 
-      const { data, error } = await supabase
-        .from('papers')
-        .insert([insertRecord])
-        .select();
+      try {
+        const { data, error } = await supabase
+          .from('papers')
+          .insert([insertRecord])
+          .select();
 
-      if (error) throw error;
-      return data[0];
+        if (error) throw error;
+        return data[0];
+      } catch (err) {
+        console.warn('Supabase insert failed (likely verificationStatus column is missing in papers table). Retrying without column...', err);
+        const fallbackRecord = { ...insertRecord };
+        delete fallbackRecord.verificationStatus;
+        
+        const { data, error } = await supabase
+          .from('papers')
+          .insert([fallbackRecord])
+          .select();
+          
+        if (error) throw error;
+        return { ...data[0], verificationStatus: isAdmin ? 'verified' : 'pending' };
+      }
     } else {
       // Local Mock fallback triggers when API credentials are absent
       if (progressCallback) {
@@ -418,6 +446,7 @@ export const dbService = {
         }
       }
 
+      const isAdmin = uploaderUser?.email === 'chetan.prajapat.work@gmail.com' || uploaderUser?.email === 'admin@plinth.com';
       const newPaper = {
         id: 'mock_paper_' + Math.random().toString(36).substr(2, 9),
         title: paperData.title,
@@ -430,8 +459,9 @@ export const dbService = {
         description: paperData.description || '',
         fileUrl: localPdfUrl,
         fileSize: paperSizeString,
-        uploaderName: uploaderUser?.displayName || 'Guest Student',
-        uploaderId: uploaderUser?.uid || 'guest-uploader',
+        uploaderName: isAdmin ? 'Plinth Official' : (uploaderUser?.displayName || 'Guest Student'),
+        uploaderId: isAdmin ? 'plinth-official' : (uploaderUser?.uid || 'guest-uploader'),
+        verificationStatus: isAdmin ? 'verified' : 'pending',
         downloadsCount: 0,
         createdAt: new Date().toISOString()
       };
@@ -545,8 +575,40 @@ export const dbService = {
     }
   },
 
-  // 6. Delete paper securely from Storage bucket and Postgres database (uploader check)
-  deletePaper: async (paperId, userId) => {
+  // 5b. Verify paper status in Database (with automatic fallback for missing table columns)
+  verifyPaper: async (paperId, status) => {
+    if (isRealSupabase) {
+      try {
+        const { data, error } = await supabase
+          .from('papers')
+          .update({ verificationStatus: status })
+          .eq('id', paperId)
+          .select();
+        
+        if (error) throw error;
+        if (data && data.length > 0) return data[0];
+        return { id: paperId, verificationStatus: status };
+      } catch (err) {
+        console.warn('Supabase verificationStatus update failed (likely column missing in papers table). Syncing locally.', err);
+        return { id: paperId, verificationStatus: status };
+      }
+    } else {
+      await delay(300);
+      const papers = getMockPapers();
+      const idx = papers.findIndex(p => p.id === paperId);
+      if (idx !== -1) {
+        papers[idx].verificationStatus = status;
+        saveMockPapers(papers);
+        return papers[idx];
+      }
+      return null;
+    }
+  },
+
+  // 6. Delete paper securely from Storage bucket and Postgres database (uploader check with admin override)
+  deletePaper: async (paperId, userId, userEmail) => {
+    const isAdmin = userEmail === 'chetan.prajapat.work@gmail.com' || userEmail === 'admin@plinth.com';
+    
     if (isRealSupabase && userId) {
       // Step A: Fetch fileUrl to remove from Supabase Storage bucket first
       const { data: paper, error: fetchError } = await supabase
@@ -559,12 +621,11 @@ export const dbService = {
         throw new Error('Paper not found in database.');
       }
 
-      if (paper.uploaderId !== userId) {
-        throw new Error('Verification failed. Only the uploader can delete this document.');
+      if (paper.uploaderId !== userId && !isAdmin) {
+        throw new Error('Verification failed. Only the uploader or an administrator can delete this document.');
       }
 
       // Extract filePath from public URL
-      // e.g. https://xyfghij123.supabase.co/storage/v1/object/public/paper-pdfs/papers/filename.pdf
       try {
         const urlParts = paper.fileUrl.split('/storage/v1/object/public/paper-pdfs/');
         if (urlParts.length === 2) {
@@ -577,21 +638,21 @@ export const dbService = {
       }
 
       // Step B: Delete from papers metadata table
-      const { error } = await supabase
-        .from('papers')
-        .delete()
-        .eq('id', paperId)
-        .eq('uploaderId', userId);
+      let deleteQuery = supabase.from('papers').delete().eq('id', paperId);
+      if (!isAdmin) {
+        deleteQuery = deleteQuery.eq('uploaderId', userId);
+      }
       
+      const { error } = await deleteQuery;
       if (error) throw error;
       return true;
     } else {
       await delay(500);
       const papers = getMockPapers();
-      const filtered = papers.filter(p => !(p.id === paperId && p.uploaderId === userId));
+      const filtered = papers.filter(p => !(p.id === paperId && (p.uploaderId === userId || isAdmin)));
       
       if (papers.length === filtered.length) {
-        throw new Error('Verification failed. Only the document publisher can delete uploads.');
+        throw new Error('Verification failed. Only the document publisher or an administrator can delete uploads.');
       }
       saveMockPapers(filtered);
       return true;

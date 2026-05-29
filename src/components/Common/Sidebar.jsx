@@ -141,6 +141,21 @@ export const Sidebar = ({ isOpen, onClose, activeTab, setActiveTab, onOpenAuth }
             <Upload size={18} />
             <span>Upload Paper</span>
           </button>
+
+          {isAuthenticated && (currentUser?.email === 'chetan.prajapat.work@gmail.com' || currentUser?.email === 'admin@plinth.com') && (
+            <button 
+              className={`dropdown-item ${activeTab === 'admin' ? 'dropdown-item-active' : ''}`}
+              onClick={() => handleLinkClick('admin')}
+              style={{ 
+                background: activeTab === 'admin' ? 'rgba(var(--primary-rgb), 0.08)' : 'transparent',
+                color: 'var(--primary)',
+                fontWeight: '800'
+              }}
+            >
+              <BookOpen size={18} />
+              <span>Admin Panel</span>
+            </button>
+          )}
         </div>
 
         {/* Footer Actions */}

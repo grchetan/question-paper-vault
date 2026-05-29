@@ -8,6 +8,7 @@ import { PaperCard } from './components/Dashboard/PaperCard';
 import { PaperViewer } from './components/Dashboard/PaperViewer';
 import { SkeletonLoader } from './components/Dashboard/SkeletonLoader';
 import { UploadForm } from './components/Upload/UploadForm';
+import { AdminPanel } from './components/Admin/AdminPanel';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider, useToast } from './context/ToastContext';
@@ -885,6 +886,11 @@ const AppContent = () => {
           <section className="section-padding" style={{ backgroundColor: 'var(--bg-primary)' }}>
             <UploadForm setActiveTab={setActiveTab} />
           </section>
+        )}
+ 
+        {/* TAB 4b: Admin Panel Moderation Dashboard */}
+        {activeTab === 'admin' && (currentUser?.email === 'chetan.prajapat.work@gmail.com' || currentUser?.email === 'admin@plinth.com') && (
+          <AdminPanel onViewPaper={setActivePaper} />
         )}
  
         {/* TAB 5: Privacy Policy */}

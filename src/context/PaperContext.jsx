@@ -129,11 +129,27 @@ export const PaperProvider = ({ children }) => {
   const deletePaper = async (paperId) => {
     if (!currentUser) return;
     try {
-      await dbService.deletePaper(paperId, currentUser.uid);
+      await dbService.deletePaper(paperId, currentUser.uid, currentUser.email);
       setPapers(prev => prev.filter(p => p.id !== paperId));
       setAllPapers(prev => prev.filter(p => p.id !== paperId));
     } catch (error) {
       console.error('Error deleting paper:', error);
+      throw error;
+    }
+  };
+
+  // Verify Paper status (Admin only helper)
+  const verifyPaper = async (paperId, status) => {
+    if (!currentUser) return;
+    try {
+      const updatedRecord = await dbService.verifyPaper(paperId, status);
+      if (updatedRecord) {
+        setPapers(prev => prev.map(p => p.id === paperId ? { ...p, verificationStatus: status } : p));
+        setAllPapers(prev => prev.map(p => p.id === paperId ? { ...p, verificationStatus: status } : p));
+      }
+      return updatedRecord;
+    } catch (error) {
+      console.error('Error verifying paper:', error);
       throw error;
     }
   };
@@ -208,6 +224,7 @@ export const PaperProvider = ({ children }) => {
     toggleBookmark,
     downloadPaper,
     deletePaper,
+    verifyPaper,
     uniqueBoards,
     uniqueYears,
     refreshPapers,

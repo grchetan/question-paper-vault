@@ -56,7 +56,10 @@ export const PaperCard = ({ paper, onViewPaper }) => {
     document.body.removeChild(link);
   };
 
+  const isAdmin = currentUser?.email === 'chetan.prajapat.work@gmail.com' || currentUser?.email === 'admin@plinth.com';
   const isUploader = isAuthenticated && paper.uploaderId === currentUser?.uid;
+  const canDelete = isUploader || isAdmin;
+  const isPlinthOfficial = paper.uploaderId === 'plinth-official';
 
   const handleDeleteClick = async (e) => {
     e.stopPropagation();
@@ -73,10 +76,18 @@ export const PaperCard = ({ paper, onViewPaper }) => {
   return (
     <div className="paper-card glass-panel anim-slide-up" onClick={() => onViewPaper(paper)}>
       {/* Badge & Bookmark header */}
-      <div className="paper-card-top">
-        <span className={`paper-badge ${getBadgeClass(paper.category)}`}>
-          {paper.category || 'Exam'}
-        </span>
+      <div className="paper-card-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <span className={`paper-badge ${getBadgeClass(paper.category)}`}>
+            {paper.category || 'Exam'}
+          </span>
+          {paper.verificationStatus === 'verified' && (
+            <span className="verified-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#10B981', color: '#ffffff', border: '2px solid var(--border)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', boxShadow: '2px 2px 0px var(--border)' }}>
+              <svg viewBox="0 0 24 24" width="11" height="11" stroke="currentColor" strokeWidth="4.5" fill="none" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(1px 1px 0px rgba(0,0,0,0.15))' }}><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>Verified</span>
+            </span>
+          )}
+        </div>
         <button 
           className={`bookmark-card-btn ${isBookmarked ? 'bookmark-active' : ''}`}
           onClick={handleBookmarkClick}
@@ -112,11 +123,20 @@ export const PaperCard = ({ paper, onViewPaper }) => {
       {/* Footer Uploader Info + Actions */}
       <div className="paper-uploader">
         <div className="uploader-info">
-          <User size={13} />
-          <span>Uploaded by <strong>{paper.uploaderName.split(' ')[0]}</strong></span>
+          {isPlinthOfficial ? (
+            <span className="plinth-official-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'rgba(253, 155, 155, 0.12)', color: 'var(--primary)', border: '1px solid var(--primary)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.75rem', fontWeight: '800' }}>
+              <Award size={12} fill="var(--primary)" />
+              <span>Plinth Official</span>
+            </span>
+          ) : (
+            <>
+              <User size={13} />
+              <span>Uploaded by <strong>{paper.uploaderName.split(' ')[0]}</strong></span>
+            </>
+          )}
         </div>
         <div className="paper-actions">
-          {isUploader && (
+          {canDelete && (
             <button 
               className="btn btn-secondary" 
               style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: 'var(--radius-sm)', color: 'var(--error)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
